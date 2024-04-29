@@ -1,10 +1,17 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, dialog } from 'electron';
 import { join } from 'path';
+import { readFile } from 'node:fs/promises'
+
+try {
+  require('electron-reloader')(module)
+} catch (_) {}
+
 
 const createWindow = () => {
   const mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
+    show: false,
     webPreferences: {
       preload: join(__dirname, 'preload.js'),
     },
@@ -17,6 +24,12 @@ const createWindow = () => {
       join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`),
     );
   }
+
+  mainWindow.once('ready-to-show', () => {
+    mainWindow.show()
+    mainWindow.focus()
+    // showOpenDialog(mainWindow)
+  })
 
   mainWindow.webContents.openDevTools({
     mode: 'detach',
@@ -36,3 +49,23 @@ app.on('activate', () => {
     createWindow();
   }
 });
+
+
+const showOpenDialog = async (browserWindow: BrowserWindow) => {
+  const result = await dialog.showOpenDialog(browserWindow, {
+    properties: ['openFile'],
+    filters: [{ name: 'Markdown File', extensions: ['md']}]
+  })
+
+  if(result.canceled) return
+
+  const [filepath] = result.filePaths
+  openFile(browserWindow, filepath)
+} 
+
+const openFile = async(browserWindow: BrowserWindow, filePath: string) => {
+  const content = await readFile(filePath, { encoding: 'utf-8' })
+
+  browserWindow.webContents.send('file-opened', content, filePath)
+  console.log(content)  
+}

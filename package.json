@@ -27,12 +27,14 @@
     "@electron-forge/plugin-vite": "^6.3.0",
     "@tailwindcss/typography": "^0.5.9",
     "autoprefixer": "^10.4.15",
-    "electron": "26.0.0",
+    "electron": "^26.6.10",
+    "electron-reloader": "^1.2.3",
     "postcss": "^8.4.28",
     "tailwindcss": "^3.3.3"
   },
   "dependencies": {
     "electron-squirrel-startup": "^1.0.0",
+    "nodemon": "^3.1.0",
     "rehype-sanitize": "^5.0.1",
     "rehype-stringify": "^9.0.4",
     "remark-gfm": "^3.0.1",
