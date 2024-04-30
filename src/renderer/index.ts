@@ -16,3 +16,8 @@ Elements.OpenFileButton.addEventListener('click', () => {
   console.log('Open file button clicked');
   window.api.showOpenDialog();
 });
+
+Elements.ExportHtmlButton.addEventListener('click', () => {
+  const html = Elements.RenderedView.innerHTML;
+  window.api.showExportHtmlDialog(html)
+})
