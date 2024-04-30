@@ -9,3 +9,8 @@ Elements.MarkdownView.addEventListener('input', async () => {
 Elements.OpenFileButton.addEventListener('click', () => {
   window.api.showOpenDialog();
 })
+
+window.api.onFileOpen((content: string) => {
+  Elements.MarkdownView.value = content
+  renderMarkdown(content)
+})
