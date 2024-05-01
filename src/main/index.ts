@@ -6,6 +6,15 @@ try {
   require('electron-reloader')(module)
 } catch (_) {}
 
+type MarkdownFile = {
+  content?: string
+  filePath?: string
+}
+
+let currentFile: MarkdownFile = {
+  content: '',
+  filePath: undefined
+}
 
 const createWindow = () => {
   const mainWindow = new BrowserWindow({
@@ -104,4 +113,35 @@ const showExportHtmlDialog = async (browserWindow: BrowserWindow, html: string) 
 
 const exportHtml = async (filePath: string, html: string) => {
   await writeFile(filePath, html, { encoding: 'utf-8' })
+}
+
+ipcMain.on('save-file', async (event, content: string) => {
+  const browserWindow = BrowserWindow.fromWebContents(event.sender)
+
+  if(!browserWindow) return
+
+  await saveFile(browserWindow, content)
+})
+
+const showSaveDialog = async (browserWindow: BrowserWindow) => {
+  const result = await dialog.showSaveDialog(browserWindow, {
+    title: 'Save Markdown',
+    filters: [{ name: 'Markdown file', extensions: ['md'] }]
+  })
+
+  if(result.canceled) return
+
+  const { filePath } = result // It is the path (with name of the file included) that we for the file to be save
+
+  if(!filePath) return
+
+  return filePath
+}
+
+const saveFile = async (browserWindow: BrowserWindow, content: string) => {
+  const filePath = currentFile.filePath ?? await showSaveDialog(browserWindow)
+
+  if(!filePath) return
+
+  await writeFile(filePath, content, { encoding: 'utf-8'})
 }
