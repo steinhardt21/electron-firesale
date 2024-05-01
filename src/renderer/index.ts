@@ -14,3 +14,8 @@ window.api.onFileOpen((content: string) => {
   Elements.MarkdownView.value = content
   renderMarkdown(content)
 })
+
+Elements.ExportHtmlButton.addEventListener('click', () => {
+  const html = Elements.RenderedView.innerHTML;
+  window.api.showExportHtmlDialog(html);
+})

@@ -1,6 +1,6 @@
 import { app, BrowserWindow, dialog, ipcMain } from 'electron';
 import { join } from 'path';
-import { readFile } from 'node:fs/promises'
+import { readFile, writeFile } from 'node:fs/promises'
 
 try {
   require('electron-reloader')(module)
@@ -77,3 +77,31 @@ ipcMain.on('show-open-dialog', (event) => {
 
   showOpenDialog(browserWindow)
 })
+
+ipcMain.on('show-export-html-dialog', async (event, html: string) => {
+  // who sent me this event
+  const browserWindow = BrowserWindow.fromWebContents(event.sender)
+
+  if(!browserWindow) return
+
+  showExportHtmlDialog(browserWindow, html)
+})
+
+const showExportHtmlDialog = async (browserWindow: BrowserWindow, html: string) => {
+  const result = await dialog.showSaveDialog(browserWindow, {
+    title: 'Export HTML',
+    filters: [{ name: 'HTML file', extensions: ['html'] }]
+  })
+
+  if(result.canceled) return
+
+  const { filePath } = result // It is the path (with name of the file included) that we for the file to be save
+
+  if(!filePath) return
+
+  exportHtml(filePath, html)
+} 
+
+const exportHtml = async (filePath: string, html: string) => {
+  await writeFile(filePath, html, { encoding: 'utf-8' })
+}

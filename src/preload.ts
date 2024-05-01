@@ -16,5 +16,8 @@ contextBridge.exposeInMainWorld('api', {
     ipcRenderer.on('file-opened', (_, content: string) => {
       callback(content)
     })
+  },
+  showExportHtmlDialog: (html: string) => {
+    ipcRenderer.send('show-export-html-dialog', html)
   }
 })
